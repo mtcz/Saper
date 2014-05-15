@@ -1,4 +1,4 @@
-//wersja 0.1B
+//wersja 0.2B
 //Autorzy: Mateusz Czy¿ - 45746, Mateusz Serwan - 45837, Artur Kubok - 45787
 #include <iostream>
 #include <ctime>
@@ -17,7 +17,7 @@ public:
 	int	x;		//szerokoœæ planszy
 	int	y;		//wysokoœæ planszy
 	int z;		//iloœæ min
-	pole *plansza[30][30];
+	pole *plansza[40][40];
 
 	void tworzplansze(int x, int y, int z){
 
@@ -31,26 +31,45 @@ public:
 			}
 		}
 	}
-	void drukujplansze(int x, int y){
+	void drukujplansze(int xzaznaczonej, int yzaznaczonej){
+		clrscr();
+		textcolor(10);
+		for (int i = 0; i < x+2; i++)
+		{
+			cout << '=';
+		}
+		cout << endl;
 		for (int i = 0; i < y; i++)
 		{
+			cout << '|';
 			for (int j = 0; j < x; j++)
 			{
-				cout << plansza[i][j]->znak;
+				if (xzaznaczonej==i && yzaznaczonej==j)
+				{
+					textcolor(4);
+				}
+				if(plansza[i][j]->odkryty==1) cout << plansza[i][j]->znak;
+				else cout << '#';
+				textcolor(10);
 			}
+
+			cout << '|';
 			cout << endl;
+		}
+		for (int i = 0; i < x+2; i++)
+		{
+			cout << '=';
 		}
 	}
 	void rozlozminy(int miny){
-		int liczbamin = 0;
 		int xminy = 0;
 		int yminy = 0;
 		for (int i = 0; i < miny; i++)
 		{
 			do
 			{
-				xminy = rand() % (x);
-				yminy = rand() % (y);
+				xminy = rand() % (y);
+				yminy = rand() % (x);
 
 			} while (plansza[xminy][yminy]->znak == '*');
 
@@ -60,6 +79,8 @@ public:
 	}
 	void zanumerujplansze(){
 		int numer;
+
+		cout << endl;
 		for (int i = 0; i < y; i++)
 		{
 			for (int j = 0; j < x; j++)
@@ -91,25 +112,93 @@ public:
 				}
 
 
-
 			}
 		}
 
+
+	
+
+	}
+	void steruj(){
+		int xzaznaczonej = 0;
+		int yzaznaczonej = 0;
+		while (true)
+		{
+			if (GetAsyncKeyState(VK_RIGHT)) {
+				yzaznaczonej++;
+				drukujplansze(xzaznaczonej, yzaznaczonej);
+			}
+			if (GetAsyncKeyState(VK_LEFT)) {
+				yzaznaczonej--;
+				drukujplansze(xzaznaczonej, yzaznaczonej);
+			}
+			if (GetAsyncKeyState(VK_UP)) {
+				xzaznaczonej--;
+				drukujplansze(xzaznaczonej, yzaznaczonej);
+			}
+			if (GetAsyncKeyState(VK_DOWN)) {
+				xzaznaczonej++;
+				drukujplansze(xzaznaczonej, yzaznaczonej);
+			}
+			if (GetAsyncKeyState(VK_LSHIFT)) {
+				plansza[xzaznaczonej][yzaznaczonej]->odkryty = 1;
+				drukujplansze(xzaznaczonej, yzaznaczonej);
+			}
+			Sleep(200);
+		}
 	}
 
 };
 
 int main(){
 	srand(time(NULL));
-	gra *ekspert = new gra;
-	ekspert->x = 20;
-	ekspert->y = 20;
-	ekspert->z = 20;
-	ekspert->tworzplansze(20, 20, 20);
-	ekspert->rozlozminy(40);
-	ekspert->zanumerujplansze();
-	ekspert->drukujplansze(20, 20);
+	int wybor;
+	cout << "Wybierz poziom trudnosci: \n [1]-Latwy(9x9 10 min)\n [2]-Sredni(16x16 40 min)\n [3]-Trudny(30x16 99 min)\n [4]-Wlasny";
+	cin >> wybor;
+	gra *nowagra = new gra;
+	switch (wybor)
+	{
+	case 1: {
+				clrscr();
+				nowagra->x = 9;
+				nowagra->y = 9;
+				nowagra->z = 10;
+				nowagra->tworzplansze(9, 9, 10);
+				nowagra->rozlozminy(10);
+				
+				break;
+	}
+	case 2: {
+				clrscr();
+				
+				nowagra->x = 16;
+				nowagra->y = 16;
+				nowagra->z = 40;
+				nowagra->tworzplansze(16, 16, 40);
+				nowagra->rozlozminy(40);
+	
+				break;
+	}
+	case 3: {
+				clrscr();
+				nowagra->x = 30;
+				nowagra->y = 16;
+				nowagra->z = 99;
+				nowagra->tworzplansze(30, 16, 99);
+				nowagra->rozlozminy(99);
+	
+				break;
+	}
+	case 4: {
+				clrscr();
+				cout << "Ta opcja bedzie dostepna w nastepnych wersjach gry";
+				break;
 
+	}
+	}
+	nowagra->zanumerujplansze();
+	nowagra->drukujplansze(0, 0);
+	nowagra->steruj();
 
 
 	cin.get();
